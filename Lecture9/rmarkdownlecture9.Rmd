@@ -10,7 +10,7 @@ keep_md: yes
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Let's load in files needed for the class
+Let's load in files needed for the class and test git stuff from the future
 
 ```{r}
 Wisconsin_cancer <- read.csv("~/Downloads/WisconsinCancer.csv")
