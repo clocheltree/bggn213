@@ -3,6 +3,7 @@ title: "Lecture_9_markdown"
 author: "Cody Ocheltree"
 date: "5/2/2018"
 output: html_document
+keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
