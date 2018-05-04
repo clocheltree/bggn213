@@ -50,7 +50,7 @@ add(17,2)
 ```
 Does this work?
 ```{r}
-add(1,2,3)
+# add(1,2,3)
 ```
 Write 2nd Function
 
