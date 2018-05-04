@@ -1,0 +1,134 @@
+---
+title: "Lecture_9_markdown"
+author: "Cody Ocheltree"
+date: "5/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Let's load in files needed for the class
+
+```{r}
+Wisconsin_cancer <- read.csv("~/Downloads/WisconsinCancer.csv")
+new_samples <- read.csv("~/Downloads/new_samples.csv")
+```
+
+```{r}
+head(Wisconsin_cancer)
+table(Wisconsin_cancer$diagnosis)
+```
+
+Let's make a data table for the Wisconsin data table including only the numeric values
+
+```{r}
+Wisconsin_df <- Wisconsin_cancer[ , 3:33]
+rownames(Wisconsin_df) <- Wisconsin_cancer$id
+View(Wisconsin_df)
+```
+
+Convert the diagnoses from Wisconsin_cancer into a numeric evaluation
+
+```{r}
+diagnosis <- as.numeric(Wisconsin_cancer$diagnosis == "M")
+View(diagnosis)
+table(diagnosis)
+```
+
+Let's use PCA. Let's check the mean and standard deviation to determine if the data should be scaled.
+
+```{r}
+# Check column means and standard deviations
+plot(colMeans(Wisconsin_df), type = "o")
+
+plot(apply(Wisconsin_df,2,sd), type = "o")
+```
+
+Data needs to be scaled
+
+```{r}
+# Wisconsin_pca <- prcomp(Wisconsin_df, scale = T)
+# Wisconsin_pca
+```
+
+A column in the data frame is causing problems - it lacks any data. Let's remove the column.
+
+```{r}
+better_wisconsin_df <- Wisconsin_cancer[ , 3:32]
+
+better_wisconsin_pca <- prcomp(better_wisconsin_df, scale = T)
+summary(better_wisconsin_pca)
+```
+
+```{r}
+plot(better_wisconsin_pca$x[,1], better_wisconsin_pca$x[,2], col=diagnosis+1)
+```
+
+```{r}
+# Scree plot to determine where the elbow is between PCA's performed (variance)
+
+pca_variance <- better_wisconsin_pca$sdev^2
+pve <- pca_variance / sum(pca_variance)
+
+plot(pve, xlab = "Principal Component", 
+     ylab = "Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "o")
+```
+
+```{r}
+barplot(pve, names.arg=paste("PC", 1:length(pve)), las=2, axes = F, ylab = "Proportion of variance")
+axis(2, at=pve, labels=round(pve,2)*100)
+```
+
+Section 3 of the mini-project - Hierarchical clustering of a dataset
+
+```{r}
+# scaling the dataset for clustering
+
+data_scaled <- scale(better_wisconsin_df)
+data_distance <- dist(data_scaled)
+wisconsin_hclust <- hclust(data_distance, method = "complete")
+plot(wisconsin_hclust)
+```
+
+```{r}
+wisconsin_hclust_clusters <- cutree(wisconsin_hclust, h=19)
+sum(wisconsin_hclust_clusters)
+```
+
+Compare the analysis from the hierarchical clustering to that of the diagnosis from the data
+
+```{r}
+table(diagnosis, wisconsin_hclust_clusters)
+```
+
+This clustering method seems more accurate in binning malignant and benign patients
+
+```{r}
+wisconsin_hclust_clusters2 <- cutree(wisconsin_hclust, h=21)
+table(diagnosis, wisconsin_hclust_clusters2)
+```
+
+Section 5
+
+```{r}
+wisconsin_pca_hclust <- hclust(dist(better_wisconsin_pca$x[ , 1:3]), method = "ward.D2")
+plot(wisconsin_pca_hclust)
+
+# Trim this clustering into 4 clusters
+
+wisconsin_pca_hclust_clusters <- cutree(wisconsin_pca_hclust, k=2)
+table(wisconsin_pca_hclust_clusters)
+```
+
+
+Other stuff - predicting cancer malignancies
+
+```{r}
+npc <- predict(better_wisconsin_pca, newdata = new_samples)
+plot(better_wisconsin_pca$x[,1:2], col = wisconsin_hclust_clusters2)
+points(npc[,1], npc[,2], col=c("purple", "blue"), pch = 16, cex=3)
+```
+
