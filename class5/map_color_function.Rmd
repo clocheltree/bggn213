@@ -3,6 +3,7 @@ title: "Map_color_function"
 author: "Cody Ocheltree"
 date: "4/20/2018"
 output: html_document
+keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
