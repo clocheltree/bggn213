@@ -1,0 +1,93 @@
+---
+title: "Map_color_function"
+author: "Cody Ocheltree"
+date: "4/20/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+map.colors <- function (value,high.low,palette) {
+  proportion <- ((value-high.low[1])/(high.low[2]-high.low[1]))
+  index <- round ((length(palette)-1)*proportion)+1
+  return (palette[index])
+}
+```
+
+```{r}
+map.colors2 <- function (x, high.low = range(x), palette = cm.colors(100)) {
+  
+  # determine where in the 'high.low' range our value of x lies
+  percent <- ((x - high.low[1]) / (high.low[2] - high.low[1]))
+  
+  
+  # where in the vector of colors is this 'percent'
+  index <- round ((length (palette) - 1) * percent) + 1
+  
+  return (palette[index])
+}
+```
+
+## Working with our own functions
+
+My first function
+
+```{r}
+add <- function (x, y = 1){
+  
+  # Sum the input x and y
+  x + y
+}
+```
+
+Let's test our first function
+```{r}
+add(17,2)
+```
+Does this work?
+```{r}
+add(1,2,3)
+```
+Write 2nd Function
+
+```{r}
+rescale <- function(x){
+  rng <- range(x)
+  (x - rng[1]/(rng[2]-rng[1]))
+  
+}
+```
+
+```{r}
+rescale2 <- function(x){
+  rng <- range(x, na.rm=T)
+  ((x - rng[1])/(rng[2]-rng[1]))
+  
+}
+```
+
+```{r}
+rescale3 <- function(x, na.rm=T,plot=F){
+  if(na.rm) {
+    range <- range(x, na.rm=na.rm)
+    
+  } else {
+    rng <- range(x)
+    
+  }
+  print("hello")
+ answer <- ((x - rng[1])/(rng[2]-rng[1]))
+ return(answer)
+  print("is it me you're looking for")
+
+  if(plot) {
+    plot(answer,typ="b", lwd=4)
+    
+  }
+  print("I can see it in yo face gurl")
+  
+  }
+```
