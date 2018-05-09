@@ -1,0 +1,17 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lecture 12 - Protein Structure
+
+```{r}
+data_export_summary <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture12/Data Export Summary.csv", row.names = 1)
+xray <- data_export_summary[1,]
+xray
+
+```
