@@ -10,8 +10,101 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Lecture 12 - Protein Structure
 
 ```{r}
+library(bio3d)
+```
+
+```{r}
 data_export_summary <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture12/Data Export Summary.csv", row.names = 1)
-xray <- data_export_summary[1,]
-xray
+total <- data_export_summary$Total
+xray <- data_export_summary[1, 1:4]
+sum_total <- sum(total)
+sum_xray <- sum(xray)
+percent_xray <- sum_xray / sum_total
+percent_xray
+```
+
+Let's load in a pdb file
+
+```{r}
+protein_1hsg <- read.pdb("1HSG")
+protein_1hsg
+```
+ 
+```{r}
+attributes(protein_1hsg)
+```
+```{r}
+head(protein_1hsg$atom)
+```
+ 
+```{r}
+protein_1hsg$atom[1:2, c("eleno", "elety", "x","y","z")]
+```
+ 
+```{r}
+inds_ligand <- atom.select(protein_1hsg, "ligand")
+inds
+```
+ 
+```{r}
+protein_1hsg$atom[inds_ligand$atom,]
+```
+ 
+```{r}
+inds_protein <- atom.select(protein_1hsg, "protein")
+protein_1hsg$atom[inds_protein$atom,]
+```
+ 
+```{r}
+write.pdb(protein_1hsg, file = "1hsg_ligand.pdb")
 
 ```
+ 
+```{r}
+# Download some example PDB files
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+files <- get.pdb(ids, split = TRUE)
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE)
+# Print to screen a summary of the 'pdbs' object
+pdbs
+```
+
+```{r}
+# Access the first 5 rows, and 8 columns
+pdbs$ali[1:5, 1:8]
+## [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## ./split_chain/1TND_B.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+## ./split_chain/1AGR_A.pdb "L" "S" "A" "E" "D" "K" "A" "A"
+## ./split_chain/1TAG_A.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+## ./split_chain/1GG2_A.pdb "L" "S" "A" "E" "D" "K" "A" "A"
+## ./split_chain/1KJY_A.pdb "-" "-" "-" "-" "-" "-" "-" "-"
+# Associated residues numbers
+pdbs$resno[1:5, 1:8]
+## [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## ./split_chain/1TND_B.pdb NA NA NA NA NA NA NA NA
+## ./split_chain/1AGR_A.pdb 5 6 7 8 9 10 11 12
+## ./split_chain/1TAG_A.pdb NA NA NA NA NA NA NA NA
+## ./split_chain/1GG2_A.pdb 5 6 7 8 9 10 11 12
+## ./split_chain/1KJY_A.pdb NA NA NA NA NA NA NA NA
+```
+
+```{r}
+aa <- get.seq("1ake_A")
+
+# Blast or hmmer search
+b <- blast.pdb(aa)
+```
+
+```{r}
+# Plot a summary of search results
+hits <- plot(b)
+## * Possible cutoff values: 198 -3
+## Yielding Nhits: 39 209
+##
+## * Chosen cutoff value of: 198
+## Yielding Nhits: 39
+```
+
+ 
+ 
