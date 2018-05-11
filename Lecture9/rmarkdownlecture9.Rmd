@@ -25,26 +25,26 @@ table(Wisconsin_cancer$diagnosis)
 Let's make a data table for the Wisconsin data table including only the numeric values
 
 ```{r}
-Wisconsin_df <- Wisconsin_cancer[ , 3:33]
-rownames(Wisconsin_df) <- Wisconsin_cancer$id
-View(Wisconsin_df)
+#Wisconsin_df <- Wisconsin_cancer[ , 3:33]
+#rownames(Wisconsin_df) <- Wisconsin_cancer$id
+#View(Wisconsin_df)
 ```
 
 Convert the diagnoses from Wisconsin_cancer into a numeric evaluation
 
 ```{r}
-diagnosis <- as.numeric(Wisconsin_cancer$diagnosis == "M")
-View(diagnosis)
-table(diagnosis)
+#diagnosis <- as.numeric(Wisconsin_cancer$diagnosis == "M")
+#View(diagnosis)
+#table(diagnosis)
 ```
 
 Let's use PCA. Let's check the mean and standard deviation to determine if the data should be scaled.
 
 ```{r}
 # Check column means and standard deviations
-plot(colMeans(Wisconsin_df), type = "o")
+#plot(colMeans(Wisconsin_df), type = "o")
 
-plot(apply(Wisconsin_df,2,sd), type = "o")
+#plot(apply(Wisconsin_df,2,sd), type = "o")
 ```
 
 Data needs to be scaled
