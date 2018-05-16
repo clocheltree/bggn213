@@ -9,22 +9,52 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Lecture 13 - Analysis of SNPs and Genotypes from online datasets
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+snp_genotypes <- read.csv("~/Desktop/bggn213/Bggn213_github/lecture13/373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378 (1).csv")
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+table(snp_genotypes[,2]) / nrow(snp_genotypes) * 100
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Sequencing in R
+
+```{r}
+library(seqinr)
+library(gtools)
+phred <- asc( s2c("DDDDCDEDCDDDDBBDDDCC@") ) - 33
+phred
+## D D D D C D E D C D D D D B B D D D C C @
+## 35 35 35 35 34 35 36 35 34 35 35 35 35 33 33 35 35 35 34 34 31
+prob <- 10**(-phred/10)
+prob
+```
+
+RNA Sequencing Results
+
+```{r}
+seq_results <- read.table("rs8067378_ENSG00000172057.6.txt")
+summary(seq_results)
+```
+
+```{r}
+summary(seq_results$exp[seq_results$geno == "G/G"])
+summary(seq_results$exp[seq_results$geno == "A/G"])
+summary(seq_results$exp[seq_results$geno == "A/A"])
+```
+
+```{r}
+GG <- seq_results$exp[seq_results$geno == "G/G"]
+AG <- seq_results$exp[seq_results$geno == "A/G"]
+AA <- seq_results$exp[seq_results$geno == "A/A"]
+
+boxplot(GG, AG, AA, names = c("G/G", "A/G", "A/A"), notch = T)
+```
+
+```{r}
+boxplot()
+```
+
