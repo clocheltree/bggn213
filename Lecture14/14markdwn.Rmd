@@ -9,22 +9,203 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## lecture 14 - RNA sequencing stuff hoooorayyyy!
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+counts <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture14/airway_scaledcounts.csv", stringsAsFactors = FALSE)
+metadata <-  read.csv("~/Desktop/bggn213/Bggn213_github/Lecture14/airway_metadata.csv", stringsAsFactors = FALSE)
+head(metadata)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+colnames(counts)[-1]
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+metadata$id
+```
+
+```{r}
+colnames(counts)[-1] == metadata$id
+```
+
+Calculate the mean counts for each gene across all control experiments
+
+```{r}
+control <- metadata[metadata[,"dex"]=="control",]
+
+control.mean <- rowSums( counts[ ,control$id] )/ length(control$id)
+
+names(control.mean) <- counts$ensgene
+```
+
+Now calculate the mean counts for each gene across all drug treated experiments
+
+```{r}
+treated <- metadata[metadata[,"dex"]=="treated",]
+
+treated.mean <- rowSums( counts[ ,treated$id] )/ length(treated$id)
+
+names(treated.mean) <- counts$ensgene
+```
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+colSums(meancounts)
+```
+
+Plot our mean counts data for control vs treated
+
+```{r}
+plot(meancounts$control, meancounts$treated, log = "xy")
+```
+
+```{r}
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
+```{r}
+zero.vals <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+
+to.rm <- unique(zero.vals[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+```
+
+```{r}
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+
+sum(up.ind)
+sum(down.ind)
+```
+
+```{r}
+paste("up:", sum(up.ind))
+paste("down:", sum(down.ind))
+```
+
+```{r}
+ucsc_annotate <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture14/annotables_grch38.csv")
+```
+
+```{r}
+head(ucsc_annotate)
+results <- merge(mycounts, ucsc_annotate, by.x = "row.names", by.y = "ensgene")
+head(results)
+```
+
+```{r}
+# columns(org.Hs.eg.db)
+```
+
+```{r}
+mycounts$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts),
+                     column="SYMBOL",
+                     keytype="ENSEMBL",
+                     multiVals="first")
+```
+
+```{r}
+mycounts$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts),
+                     column="SYMBOL",
+                     keytype="ENSEMBL",
+                     multiVals="first")
+```
+
+```{r}
+mycounts$uniprot <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts),
+                     column="SYMBOL",
+                     keytype="ENSEMBL",
+                     multiVals="first")
+```
+
+```{r}
+head(mycounts[up.ind,])
+```
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex, 
+                              tidy=TRUE)
+dds
+```
+
+```{r}
+sizeFactors(dds)
+dispersions(dds)
+results(dds)
+```
+
+```{r}
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+summary(res)
+```
+
+```{r}
+resOrdered <- res[order(res$pvalue),]
+head(resOrdered)
+
+```
+
+Changing p-value
+
+```{r}
+res05 <- results(dds, alpha=0.05)
+summary(res05)
+res5ordered <- res05[order(res05$pvalue), ]
+head(res5ordered)
+```
+
+```{r}
+resSig05 <- subset(as.data.frame(res), padj < 0.05)
+nrow(resSig05)
+```
+
+```{r}
+resSig01 <- subset(as.data.frame(res), padj < 0.01)
+nrow(resSig01)
+```
+
+```{r}
+ord <- order(resSig01$padj)
+#View(res01[ord,])
+head(resSig01[ord,])
+write.csv(resSig01[ord,], "signif01_results.csv")
+```
+
+
+## Plotting the data
+
+```{r}
+i <- grep("CRISPLD2", resSig01$symbol)
+resSig01[i,]
+```
+
+```{r}
+plotCounts(dds, gene="ENSG00000103196", intgroup="dex")
+```
+
+```{r}
+d <- plotCounts(dds, gene="ENSG00000103196", intgroup="dex", returnData=TRUE)
+head(d)
+```
+
+```{r}
+# library(ggplot2)
+ggplot(d, aes(dex, count)) + geom_boxplot(aes(fill=dex)) + scale_y_log10() + ggtitle("CRISPLD2")
+```
+
+```{r}
+sessionInfo()
+```
+
