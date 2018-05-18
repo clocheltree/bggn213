@@ -55,6 +55,7 @@ boxplot(GG, AG, AA, names = c("G/G", "A/G", "A/A"), notch = T)
 ```
 
 ```{r}
-boxplot()
+library(ggplot2)
+ggplot(seq_results)
 ```
 
