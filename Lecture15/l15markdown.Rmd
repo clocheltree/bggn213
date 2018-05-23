@@ -1,0 +1,39 @@
+---
+title: "lecture15markdown"
+author: "Cody Ocheltree"
+date: "5/23/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lecture 15
+
+Analysis of gene sets - GO ANALYSIS
+
+```{r}
+# Load in essential packages and files
+library(DESeq2)
+
+countData <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture15/GSE37704_featurecounts.csv", row.names = 1)
+colData <- read.csv("~/Desktop/bggn213/Bggn213_github/Lecture15/GSE37704_metadata.csv", row.names = 1)
+
+head(colData)
+head(countData)
+```
+
+```{r}
+# Note we need to remove the odd first $length col in order for the data sets to match up
+
+countData <- as.matrix(countData[,-1])
+head(countData)
+```
+
+```{r}
+# Filter count data where you have 0 read count across all samples.
+countData = countData[rowSums(countData)>1, ]
+head(countData)
+```
+
