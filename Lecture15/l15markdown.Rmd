@@ -37,3 +37,142 @@ countData = countData[rowSums(countData)>1, ]
 head(countData)
 ```
 
+```{r}
+dds = DESeqDataSetFromMatrix(countData=countData,
+                             colData=colData,
+                             design=~condition)
+dds = DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+res
+```
+
+```{r}
+summary(res)
+```
+
+```{r}
+res2 <- results(dds, alpha = 0.05, lfcThreshold = 2)
+summary(res2)
+```
+
+```{r}
+table(res2$padj < 0.05)
+```
+
+```{r}
+table(res2$log2FoldChange > 2)
+```
+
+
+```{r}
+# Make a new results object 'resSig' with only significant genes
+resSig <- subset(res, padj < 0.05)
+
+# Print the first 10 strongest DOWN genes
+ord.down <- order(resSig$log2FoldChange)
+head(resSig[ ord.down, ], 10)
+```
+
+```{r}
+# Print the first 10 strongest UP genes
+ord.up <- order(resSig$log2FoldChange, decreasing = T)
+head(resSig[ ord.up, ], 10)
+```
+
+
+## Annotating our genes ! ! ! ! ! ! ! ! ! 
+
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+columns(org.Hs.eg.db)
+```
+
+```{r}
+resSig$symbol <-  mapIds(org.Hs.eg.db,
+                    keys=row.names(resSig), 
+                    column="SYMBOL",
+                    keytype="ENSEMBL",
+                    multiVals="first")
+
+resSig$entrez <-  mapIds(org.Hs.eg.db,
+                    keys=row.names(resSig), 
+                    column="ENTREZID",
+                    keytype="ENSEMBL",
+                    multiVals="first")
+
+resSig$name <-    mapIds(org.Hs.eg.db,
+                    keys=row.names(resSig), 
+                    column="GENENAME",
+                    keytype="ENSEMBL",
+                    multiVals="first")
+
+head(resSig, 10)
+```
+
+```{r}
+# Loading in essential packages for GAGE GO analysis
+
+source("http://bioconductor.org/biocLite.R")
+biocLite( c("pathview", "gage", "gageData") )
+
+library(pathview)
+
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+
+kegg.sets.hs <-  kegg.sets.hs[sigmet.idx.hs]
+head(kegg.sets.hs, 3)
+```
+
+```{r}
+foldchanges <-  resSig$log2FoldChange
+names(foldchanges) <-  resSig$entrez
+head(foldchanges)
+```
+
+```{r}
+# Get the results
+keggres <-  gage(foldchanges, gsets=kegg.sets.hs, same.dir=TRUE)
+
+attributes(keggres)
+
+head(keggres$greater)
+```
+
+```{r}
+head(keggres$less)
+```
+
+```{r}
+lapply(keggres, head)
+```
+
+```{r}
+## Sanity check displaying all pathways data
+pathways <-  data.frame(id = rownames(keggres$greater), keggres$greater)
+head(pathways)
+```
+
+```{r}
+pathview(gene.data = foldchanges, pathway.id = "hsa04110")
+```
+
+```{r}
+data(go.sets.hs)
+data(go.subs.hs)
+gobpsets = go.sets.hs[go.subs.hs$BP]
+
+gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
+
+lapply(gobpres, head)
+```
+
