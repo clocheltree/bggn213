@@ -464,7 +464,7 @@ source(&quot;http://bioconductor.org/biocLite.R&quot;)</code></pre>
 <pre><code>## Installing package(s) 'pathview', 'gage', 'gageData'</code></pre>
 <pre><code>## 
 ## The downloaded binary packages are in
-##  /var/folders/q6/7sw_799x1mj7w83s_0c16b3h0000gn/T//RtmpLl0KoK/downloaded_packages</code></pre>
+##  /var/folders/q6/7sw_799x1mj7w83s_0c16b3h0000gn/T//RtmpNIMKZw/downloaded_packages</code></pre>
 <pre><code>## installing the source package 'gageData'</code></pre>
 <pre><code>## Old packages: 'backports', 'bit', 'cluster', 'data.table', 'digest',
 ##   'foreign', 'httpuv', 'knitr', 'later', 'MASS', 'Matrix', 'mgcv', 'nlme',
@@ -777,6 +777,18 @@ lapply(gobpres, head)</code></pre>
 ## GO:0007186 G-protein coupled receptor signaling pathway  3.281613 3.281613
 ## GO:0048585 negative regulation of response to stimulus   3.264093 3.264093
 ## GO:0010817 regulation of hormone levels                  3.265376 3.265376</code></pre>
+<pre class="r"><code>head(dds$condition)</code></pre>
+<pre><code>## [1] control_sirna control_sirna control_sirna hoxa1_kd      hoxa1_kd     
+## [6] hoxa1_kd     
+## Levels: control_sirna hoxa1_kd</code></pre>
+<pre class="r"><code>head(colData[&quot;condition&quot;])</code></pre>
+<pre><code>##               condition
+## SRR493366 control_sirna
+## SRR493367 control_sirna
+## SRR493368 control_sirna
+## SRR493369      hoxa1_kd
+## SRR493370      hoxa1_kd
+## SRR493371      hoxa1_kd</code></pre>
 </div>
 
 

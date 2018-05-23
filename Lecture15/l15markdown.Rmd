@@ -176,3 +176,11 @@ gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
 lapply(gobpres, head)
 ```
 
+```{r}
+head(dds$condition)
+```
+
+```{r}
+head(colData["condition"])
+```
+
