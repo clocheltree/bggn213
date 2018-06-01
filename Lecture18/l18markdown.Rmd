@@ -1,0 +1,63 @@
+---
+title: "Lecture18markdown"
+author: "Cody Ocheltree"
+date: "6/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lecture 18 Cancer Genomics
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+```
+
+```{r}
+biocLite(c("GenomicDataCommons", "maftools"))
+```
+
+```{r}
+library(GenomicDataCommons)
+library(maftools)
+```
+
+```{r}
+GenomicDataCommons::status()
+```
+
+```{r}
+cases_by_project <- cases() %>%
+  facet("project.project_id") %>%
+  aggregations()
+head(cases_by_project)
+```
+
+```{r}
+# Make a vector for the barplot
+vector_cancer <- c(cases_by_project$project.project_id)
+
+barplot(vector_cancer$doc_count, log = "y", las = 2, names.arg = vector_cancer$key, col = c("lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "red", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue", "lightblue"))
+```
+
+```{r}
+# Make a vector for the barplot
+vector_cancer <- c(cases_by_project$project.project_id)
+
+mycols <- rep("lightblue", length(cases_by_project$project.project_id$key))
+mycols[3] <- "red"
+barplot(vector_cancer$doc_count, log = "y", las = 2, names.arg = vector_cancer$key, col = mycols)
+```
+
+```{r}
+# Make a vector for the barplot
+vector_cancer <- c(cases_by_project$project.project_id)
+
+mycols <- rep("lightblue", length(cases_by_project$project.project_id$key))
+ind <- which(cases_by_project$project.project_id$key == "TCGA-PAAD")
+mycols[ind] <- "red"
+barplot(vector_cancer$doc_count, log = "y", las = 2, names.arg = vector_cancer$key, col = mycols)
+```
+

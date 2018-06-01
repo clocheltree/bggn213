@@ -1,0 +1,59 @@
+---
+title: "Lecture18markdown"
+author: "Cody Ocheltree"
+date: "6/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Personal Cancer Vaccines
+```{r}
+
+```
+
+
+```{r}
+library(bio3d)
+seqs <- read.fasta("~/Downloads/lecture18_sequences.fa")
+seqs
+```
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+```
+
+```{r}
+biocLite("msa")
+```
+
+```{r}
+library(msa)
+```
+
+```{r}
+data1 <- conserv(seqs$ali, method = "identity")
+```
+
+
+```{r}
+View(data1)
+```
+
+```{r}
+hits <- which(data1 < 1)
+hits
+```
+
+```{r}
+gaps <- gap.inspect(seqs)
+gaps
+```
+
+```{r}
+data2 <- hits[hits %in% gaps$f.inds]
+data2
+```
+
